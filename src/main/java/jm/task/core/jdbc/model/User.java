@@ -6,7 +6,6 @@ import javax.persistence.Table;
 
 @Table
 public class User {
-    public Object saveUser;
     @Id
     private Long id;
 
