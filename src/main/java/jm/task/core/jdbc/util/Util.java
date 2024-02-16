@@ -9,6 +9,7 @@ public class Util {
 
 
 
+
     public static String getURL() {
         return URL;
     }
@@ -26,14 +27,25 @@ public class Util {
 
         try {
             connection = DriverManager.getConnection(getURL(), getNameUser(), getPassword());
-            System.out.println("Connected to the database");
+            System.out.println("Соединение с базой данных установленно");
         } catch (SQLException e) {
-            System.out.println("Could not connect to the database");
+            System.out.println("Случился анлак и вы не подключились");
             e.printStackTrace();
         }
 
         return connection;
     }
+
+    public static void closeConnection() {
+        try {
+            if (getConnection() != null) {
+                getConnection().close();
+                System.out.println("Соединение с базой данных закрыто");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+}
 
 
