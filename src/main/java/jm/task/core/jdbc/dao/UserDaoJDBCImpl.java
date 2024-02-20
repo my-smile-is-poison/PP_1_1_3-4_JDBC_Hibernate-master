@@ -3,30 +3,25 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class UserDaoJDBCImpl implements UserDao {
-    private final  Connection connection = Util.getConnection();
+    private static final Connection connection = Util.getConnection();
     public UserDaoJDBCImpl() {
 
     }
 
     public void createUsersTable() {
-        try{
-            PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `data_base`.`new_table` (\n" +
+        try(Statement statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS `data_base`.`new_table` (\n" +
                     "  `id` INT NOT NULL AUTO_INCREMENT,\n" +
                     "  `name` VARCHAR(45) NULL,\n" +
                     "  `lastName` VARCHAR(45) NULL,\n" +
                     "  `age` INT NULL,\n" +
                     "  PRIMARY KEY (`id`));");
-            statement.executeUpdate();
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -34,10 +29,8 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void dropUsersTable() {
-        try {
-            PreparedStatement statement = connection.prepareStatement("DROP TABLE IF EXISTS new_table");
-            statement.executeUpdate();
-
+        try(Statement statement = connection.createStatement() ) {
+            statement.executeUpdate("DROP TABLE IF EXISTS new_table");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -46,15 +39,11 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         String query = "INSERT INTO new_table (name, lastName, age) VALUES (?, ?, ?)";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
-
             preparedStatement.executeUpdate();
-
-
         } catch (SQLException e) {
             System.out.println("Произошел анлак и пользователь не был создан");
             e.printStackTrace();
@@ -62,12 +51,9 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM new_table WHERE id = ?");
+        try (PreparedStatement statement = connection.prepareStatement("DELETE FROM new_table WHERE id = ?")) {
             statement.setLong(1, id);
             statement.executeUpdate();
-
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -77,9 +63,8 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
-        try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM new_table");
-            ResultSet resultSet = statement.executeQuery();
+        try (Statement statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM new_table");
             while (resultSet.next()){
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
@@ -97,9 +82,9 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        try{
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM new_table");
-            statement.executeUpdate();
+        try (Statement statement = connection.createStatement()) {
+
+            statement.executeUpdate("DELETE FROM new_table");
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

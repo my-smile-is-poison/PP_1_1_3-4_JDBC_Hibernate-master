@@ -7,6 +7,8 @@ public class Util {
     private static final String PASSWORD = "Wthrjdm8412rfh.";
     private static final String URL = "jdbc:mysql://localhost:3306/data_base";
 
+    private static Connection connection;
+
 
 
 
@@ -23,7 +25,7 @@ public class Util {
     }
 
     public static Connection getConnection() {
-        Connection connection = null;
+
 
         try {
             connection = DriverManager.getConnection(getURL(), getNameUser(), getPassword());
@@ -38,8 +40,8 @@ public class Util {
 
     public static void closeConnection() {
         try {
-            if (getConnection() != null) {
-                getConnection().close();
+            if (connection != null) {
+                connection.close();
                 System.out.println("Соединение с базой данных закрыто");
             }
         } catch (SQLException e) {
